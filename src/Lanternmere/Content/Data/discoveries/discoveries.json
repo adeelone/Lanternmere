@@ -1,0 +1,6 @@
+{
+  "discoveries": [
+    { "id": "journal_01_arrival", "category": "journal", "title": "Arrival", "text": "The valley was quieter than the maps suggested. Even the wind seemed to be listening for something.", "unlockedByFlag": "game_started" },
+    { "id": "journal_02_rain_garden_fragment", "category": "landmark", "title": "The Rain Garden's Name", "text": "Fragment recovered: the garden was once called Amaranth Hollow.", "unlockedByFlag": "fragment_rain_garden_recovered" }
+  ]
+}

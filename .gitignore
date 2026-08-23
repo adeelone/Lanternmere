@@ -1,0 +1,8 @@
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+Content/bin/
+Content/obj/
+*.tmbuildinfo

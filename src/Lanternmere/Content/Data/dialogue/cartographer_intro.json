@@ -1,0 +1,28 @@
+{
+  "id": "cartographer_intro",
+  "npcId": "the_cartographer",
+  "nodes": [
+    {
+      "id": "start",
+      "speaker": "The Cartographer",
+      "text": "The lantern's gone dark, and half my map with it. You're not from here, are you? Good. Maybe you'll notice what we stopped seeing.",
+      "next": "offer_task"
+    },
+    {
+      "id": "offer_task",
+      "speaker": "The Cartographer",
+      "text": "Three places lost their names when the light went out. Bring back what you find, and I'll help you write them down again.",
+      "choices": [
+        { "text": "Where should I start?", "next": "hint_rain_garden" },
+        { "text": "I'll figure it out myself.", "next": "end" }
+      ]
+    },
+    {
+      "id": "hint_rain_garden",
+      "speaker": "The Cartographer",
+      "text": "The rain garden's closest, past the gate. Something's still growing there, which is more than I can say for the rest of us.",
+      "next": "end"
+    },
+    { "id": "end", "speaker": "", "text": "", "endsConversation": true }
+  ]
+}

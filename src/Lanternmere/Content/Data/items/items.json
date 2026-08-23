@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "id": "brass_key", "displayName": "Brass Key", "description": "Worn smooth. Opens the archive door.", "iconPath": "Textures/items/brass_key" },
+    { "id": "pressed_fern", "displayName": "Pressed Fern", "description": "Found in the rain garden. Still faintly green.", "iconPath": "Textures/items/pressed_fern" },
+    { "id": "tide_glass", "displayName": "Tide Glass", "description": "Sea-worn glass from the amber shore, warm to the touch.", "iconPath": "Textures/items/tide_glass" }
+  ]
+}

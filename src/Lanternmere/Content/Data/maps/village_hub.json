@@ -1,0 +1,15 @@
+{
+  "id": "village_hub",
+  "displayName": "The Village Hub",
+  "tiledMapPath": "Content/Data/maps/village_hub.tmx",
+  "spawnPoints": {
+    "default": { "x": 160, "y": 90 },
+    "from_rain_garden": { "x": 40, "y": 90 },
+    "from_wind_cliffs": { "x": 280, "y": 60 },
+    "from_amber_shore": { "x": 160, "y": 160 }
+  },
+  "triggers": [
+    { "id": "lantern_relight_stage1", "type": "puzzle_gate", "requiresFlag": "fragment_rain_garden_recovered" }
+  ],
+  "npcSchedulePath": "Content/Data/npc/village_hub_schedule.json"
+}
