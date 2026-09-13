@@ -85,10 +85,22 @@ public sealed class InputManager
                 _keyBindings[action] = key;
             }
         }
+
+        foreach (var (actionName, buttonName) in settings.GamepadBindings)
+        {
+            if (System.Enum.TryParse<GameAction>(actionName, out var action) &&
+                System.Enum.TryParse<Buttons>(buttonName, out var button))
+            {
+                _gamepadBindings[action] = button;
+            }
+        }
     }
 
     public void Rebind(GameAction action, Keys key) => _keyBindings[action] = key;
     public void Rebind(GameAction action, Buttons button) => _gamepadBindings[action] = button;
+
+    public Keys GetKeyBinding(GameAction action) => _keyBindings.TryGetValue(action, out var key) ? key : Keys.None;
+    public Buttons GetGamepadBinding(GameAction action) => _gamepadBindings.TryGetValue(action, out var button) ? button : (Buttons)0;
 
     public void Update()
     {
@@ -120,6 +132,12 @@ public sealed class InputManager
         foreach (var (action, key) in _keyBindings)
         {
             settings.KeyBindings[action.ToString()] = key.ToString();
+        }
+
+        settings.GamepadBindings.Clear();
+        foreach (var (action, button) in _gamepadBindings)
+        {
+            settings.GamepadBindings[action.ToString()] = button.ToString();
         }
     }
 }

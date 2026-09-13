@@ -1,2 +1,2 @@
-﻿using var game = new Lanternmere.Game1();
+﻿using var game = new Lanternmere.Game1(args);
 game.Run();

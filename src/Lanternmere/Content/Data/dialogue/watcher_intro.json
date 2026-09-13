@@ -1,0 +1,130 @@
+{
+  "Id": "watcher_intro",
+  "NpcId": "the_watcher",
+  "Nodes": [
+    {
+      "Id": "start",
+      "Speaker": "The Watcher",
+      "Text": "Someone else who thinks the wind means something. Two of these three beacons matter. The rope told me which, ages ago.",
+      "Next": "offer_clues",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": "met_the_watcher",
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "met_the_watcher",
+        "Negate": true
+      },
+      "FallbackNext": "check_solved"
+    },
+    {
+      "Id": "check_solved",
+      "Speaker": "The Watcher",
+      "Text": "Lit properly, at last. I can stop watching for a while.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "fragment_wind_cliffs_recovered",
+        "Negate": false
+      },
+      "FallbackNext": "repeat"
+    },
+    {
+      "Id": "offer_clues",
+      "Speaker": "The Watcher",
+      "Text": "Ask, if you want. I don\u0027t mind saying it plainly.",
+      "Next": null,
+      "Choices": [
+        {
+          "Text": "Which two beacons?",
+          "Next": "tell_rope_clue",
+          "Condition": null,
+          "SetsFlag": null
+        },
+        {
+          "Text": "Which order?",
+          "Next": "tell_wind_clue",
+          "Condition": null,
+          "SetsFlag": null
+        },
+        {
+          "Text": "I\u0027ll work it out.",
+          "Next": "end",
+          "Condition": null,
+          "SetsFlag": null
+        }
+      ],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "tell_rope_clue",
+      "Speaker": "The Watcher",
+      "Text": "Look at the fray on the rope bridge. Whichever posts it\u0027s still lashed to \u2014 those are load-bearing.",
+      "Next": "offer_clues",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": "journal_watcher_note",
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "tell_wind_clue",
+      "Speaker": "The Watcher",
+      "Text": "The rain garden\u0027s weathervane doesn\u0027t lie. Light the upwind one first.",
+      "Next": "offer_clues",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "repeat",
+      "Speaker": "The Watcher",
+      "Text": "Go on. The beacons won\u0027t light themselves.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "end",
+      "Speaker": "",
+      "Text": "",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    }
+  ],
+  "Start": {
+    "Id": "start",
+    "Speaker": "The Watcher",
+    "Text": "Someone else who thinks the wind means something. Two of these three beacons matter. The rope told me which, ages ago.",
+    "Next": "offer_clues",
+    "Choices": [],
+    "EndsConversation": false,
+    "SetsFlag": "met_the_watcher",
+    "UnlocksDiscoveryId": null,
+    "Condition": {
+      "RequiresFlag": "met_the_watcher",
+      "Negate": true
+    },
+    "FallbackNext": "check_solved"
+  }
+}

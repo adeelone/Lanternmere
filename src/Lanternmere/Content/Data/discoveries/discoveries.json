@@ -1,6 +1,142 @@
 {
   "discoveries": [
-    { "id": "journal_01_arrival", "category": "journal", "title": "Arrival", "text": "The valley was quieter than the maps suggested. Even the wind seemed to be listening for something.", "unlockedByFlag": "game_started" },
-    { "id": "journal_02_rain_garden_fragment", "category": "landmark", "title": "The Rain Garden's Name", "text": "Fragment recovered: the garden was once called Amaranth Hollow.", "unlockedByFlag": "fragment_rain_garden_recovered" }
+    {
+      "Id": "journal_arrival_village_hub",
+      "Category": "journal",
+      "Title": "Arrival",
+      "Text": "The valley was quieter than the maps suggested. Even the wind seemed to be listening for something."
+    },
+    {
+      "Id": "journal_arrival_rain_garden",
+      "Category": "journal",
+      "Title": "The Rain Garden",
+      "Text": "Green, against all odds, and tended by someone who hasn\u0027t given up on it."
+    },
+    {
+      "Id": "journal_arrival_wind_cliffs",
+      "Category": "journal",
+      "Title": "The Wind Cliffs",
+      "Text": "Beacons in a row, unlit, facing a sea that stopped sending anything worth warning about."
+    },
+    {
+      "Id": "journal_arrival_amber_shore",
+      "Category": "journal",
+      "Title": "The Amber Shore",
+      "Text": "Glass in the sand, warm to the touch even in shade. Someone left in a hurry, or slowly enough not to notice leaving."
+    },
+    {
+      "Id": "journal_arrival_archive",
+      "Category": "journal",
+      "Title": "The Archive",
+      "Text": "Stairs down, into a room that smells like paper and salt."
+    },
+    {
+      "Id": "journal_rain_garden_fragment",
+      "Category": "landmark",
+      "Title": "The Rain Garden\u0027s Name",
+      "Text": "Fragment recovered: the garden was once called Amaranth Hollow."
+    },
+    {
+      "Id": "journal_wind_cliffs_fragment",
+      "Category": "landmark",
+      "Title": "The Wind Cliffs\u0027 Name",
+      "Text": "Fragment recovered: the cliffs were once called The Cliffwatch."
+    },
+    {
+      "Id": "journal_amber_shore_fragment",
+      "Category": "landmark",
+      "Title": "The Amber Shore\u0027s Name",
+      "Text": "Fragment recovered: the shore was once called Tern\u0027s Landing."
+    },
+    {
+      "Id": "journal_rain_garden_watering_hint",
+      "Category": "journal",
+      "Title": "A Pattern in the Wilting",
+      "Text": "The driest plot always wants water first. Read the wilt, not the guesswork."
+    },
+    {
+      "Id": "journal_cartographer_note",
+      "Category": "npc",
+      "Title": "The Cartographer\u0027s Task",
+      "Text": "The Cartographer wants the map finished before their memory of the old names fades entirely."
+    },
+    {
+      "Id": "journal_gardener_note",
+      "Category": "npc",
+      "Title": "The Gardener\u0027s Patience",
+      "Text": "The Gardener stayed for the garden, not despite it. They want it to matter to someone else, too."
+    },
+    {
+      "Id": "journal_watcher_note",
+      "Category": "npc",
+      "Title": "The Watcher\u0027s Vigil",
+      "Text": "The Watcher has kept this duty alone for years, waiting to be relieved of it by someone who understands why it mattered."
+    },
+    {
+      "Id": "journal_ferryperson_note",
+      "Category": "npc",
+      "Title": "The Scattering",
+      "Text": "The valley didn\u0027t empty all at once. The drought took the garden first, then the cliffwatch lost its purpose, and people left one boat at a time."
+    },
+    {
+      "Id": "journal_archivist_note",
+      "Category": "npc",
+      "Title": "The Archivist\u0027s Duty",
+      "Text": "The Archivist keeps the full record even believing most of it will never be read again \u2014 until now."
+    },
+    {
+      "Id": "journal_archive_final_record",
+      "Category": "journal",
+      "Title": "The Last Page",
+      "Text": "The lantern-keeper\u0027s own hand: they didn\u0027t leave because they stopped caring. They left because they were the only one left who remembered how to say goodbye properly, and it took every name they knew to do it."
+    },
+    {
+      "Id": "journal_landmark_lantern",
+      "Category": "landmark",
+      "Title": "The Central Lantern",
+      "Text": "Dark, for now. The valley\u0027s namesake, waiting."
+    },
+    {
+      "Id": "journal_landmark_signpost",
+      "Category": "landmark",
+      "Title": "The Sanded Signpost",
+      "Text": "Three roads out of the hub, and a post sanded smooth of names \u2014 deliberately, it looks like."
+    },
+    {
+      "Id": "journal_landmark_fountain",
+      "Category": "landmark",
+      "Title": "The Dry Fountain",
+      "Text": "Hasn\u0027t run in years. Still, someone sweeps the leaves from the basin."
+    },
+    {
+      "Id": "journal_landmark_weathervane",
+      "Category": "landmark",
+      "Title": "The Weathervane",
+      "Text": "Turns true. It\u0027s been pointing at something for a long time."
+    },
+    {
+      "Id": "journal_landmark_bridge",
+      "Category": "landmark",
+      "Title": "The Rope Bridge",
+      "Text": "Tight on two posts, slack on the middle one. Whatever it held once isn\u0027t there anymore."
+    },
+    {
+      "Id": "journal_landmark_tower",
+      "Category": "landmark",
+      "Title": "The Watch Tower",
+      "Text": "Built for watching the sea for something that, as far as anyone can tell, never came back."
+    },
+    {
+      "Id": "journal_landmark_shipwreck",
+      "Category": "landmark",
+      "Title": "The Shipwreck",
+      "Text": "Half-buried, and long since given up on."
+    },
+    {
+      "Id": "journal_landmark_altar",
+      "Category": "landmark",
+      "Title": "The Tide-Glass Altar",
+      "Text": "Three empty settings, worn smooth by salt and hands."
+    }
   ]
 }

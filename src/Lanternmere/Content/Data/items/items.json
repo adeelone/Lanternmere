@@ -1,7 +1,34 @@
 {
   "items": [
-    { "id": "brass_key", "displayName": "Brass Key", "description": "Worn smooth. Opens the archive door.", "iconPath": "Textures/items/brass_key" },
-    { "id": "pressed_fern", "displayName": "Pressed Fern", "description": "Found in the rain garden. Still faintly green.", "iconPath": "Textures/items/pressed_fern" },
-    { "id": "tide_glass", "displayName": "Tide Glass", "description": "Sea-worn glass from the amber shore, warm to the touch.", "iconPath": "Textures/items/tide_glass" }
+    {
+      "Id": "brass_key",
+      "DisplayName": "Brass Key",
+      "Description": "Worn smooth. Opens the archive hatch.",
+      "IconPath": "procedural:key"
+    },
+    {
+      "Id": "pressed_fern",
+      "DisplayName": "Pressed Fern",
+      "Description": "Found in the rain garden. Still faintly green.",
+      "IconPath": "procedural:leaf"
+    },
+    {
+      "Id": "tide_glass_shard_dawn",
+      "DisplayName": "Dawn-Glass Shard",
+      "Description": "Sea-worn glass, warm amber, catching the light like sunrise.",
+      "IconPath": "procedural:glass"
+    },
+    {
+      "Id": "tide_glass_shard_dusk",
+      "DisplayName": "Dusk-Glass Shard",
+      "Description": "Sea-worn glass, deep violet-amber, cooler than the other.",
+      "IconPath": "procedural:glass"
+    },
+    {
+      "Id": "tide_glass_shard_deep",
+      "DisplayName": "Deep-Glass Shard",
+      "Description": "Sea-worn glass, almost clear, heavier than it looks.",
+      "IconPath": "procedural:glass"
+    }
   ]
 }

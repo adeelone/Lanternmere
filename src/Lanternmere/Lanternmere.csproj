@@ -17,6 +17,15 @@
     <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Plain-JSON game content (regions, dialogue, items, discoveries) is
+         data-driven per the brief's architecture requirement, and is not a
+         MonoGame content-pipeline asset type — it's just copied to the
+         output directory so GameContent can read it at runtime. -->
+    <None Include="Content\Data\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Icon.ico">
       <LogicalName>Icon.ico</LogicalName>
     </EmbeddedResource>

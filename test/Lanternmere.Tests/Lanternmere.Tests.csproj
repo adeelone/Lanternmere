@@ -23,7 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Lanternmere\Lanternmere.csproj" />
+    <!-- Deliberately does NOT reference src/Lanternmere/Lanternmere.csproj
+         (the MonoGame executable): every type these tests exercise lives
+         in Lanternmere.Core, which has no GraphicsDevice or content-
+         pipeline dependency. Keeping this project Core-only means
+         `dotnet test` runs on any OS/CI runner without needing MonoGame's
+         native libs or a font available for the SpriteFont build. -->
     <ProjectReference Include="..\..\src\Lanternmere.Core\Lanternmere.Core.csproj" />
   </ItemGroup>
 

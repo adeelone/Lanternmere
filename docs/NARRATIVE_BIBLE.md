@@ -1,6 +1,6 @@
-# Lanternmere — Narrative Bible (draft)
+# Lanternmere — Narrative Bible
 
-Required by the brief before dialogue implementation: "Create a concise narrative bible before dialogue implementation. Define theme, timeline, region purpose, NPC desire, information each NPC knows, and the order in which revelations may occur." This is a first draft scaffold, not final content — see ROADMAP.md for what's still open.
+Required by the brief before dialogue implementation: "Create a concise narrative bible before dialogue implementation. Define theme, timeline, region purpose, NPC desire, information each NPC knows, and the order in which revelations may occur." This document is now implemented in full — every NPC, dialogue tree, and revelation gate described below exists in `Content/Data/dialogue/*.json` and is wired through `RegionScene`/`DialogueRunner`. See "What's NOT decided yet" at the bottom for the two items intentionally left as authorial choices, and their actual resolution.
 
 ## Theme
 
@@ -30,15 +30,15 @@ A place forgets itself when the people who named it stop telling the story. Rest
 | The Watcher (wind cliffs) | Wants to be relieved of a duty they've kept alone for years | The Cliffwatch's name; the beacon puzzle's original purpose |
 | The Archivist (archive, optional secret) | Wants the full record kept even if no one reads it | The complete history, including the lantern-keeper's real reason for leaving (final revelation, gated behind the optional secret) |
 
-## Revelation order (must-follow gate)
+## Revelation order (must-follow gate) — as implemented
 
 1. Player learns the lantern is dark and meets The Cartographer (village hub).
-2. Player recovers each region's name fragment in any order (rain garden → wind cliffs → amber shore, but non-linear is allowed).
-3. Only after all three fragments are recovered does The Ferryperson's full scattering account become available — this is the puzzle-3 gate described in the brief ("uses knowledge gathered across regions and gates the finale").
-4. The optional secret (archive) may be found any time after puzzle 2, but its final revelation about the lantern-keeper only makes narrative sense after step 3, so the archive's last document should refuse to "read" narratively satisfying until then (implementation detail — see ROADMAP puzzle documentation task).
+2. Player recovers each region's name fragment in any order the map allows: the rain garden is open immediately; the wind cliffs beacon puzzle is mechanically locked (`WindCliffsPuzzle.RainGardenVisitedFlag`) until the rain garden has actually been visited (docs/PUZZLES.md puzzle 2); the amber shore altar is locked until *both* the rain garden and wind cliffs fragments are recovered (docs/PUZZLES.md puzzle 3). So the practical order is rain garden → wind cliffs → amber shore, enforced by the puzzles themselves rather than by world geography alone.
+3. **Correction from the original draft**: this bible originally said the Ferryperson's full scattering account requires *all three* fragments — that was circular, since the amber shore puzzle IS how the third fragment is obtained. As implemented, the Ferryperson's account (and the tide-glass pattern clue needed to actually solve puzzle 3) unlocks once the *other two* fragments are recovered (`both_prior_fragments_recovered`), matching puzzle 3's own unlock condition. See `docs/PUZZLES.md`.
+4. The optional secret (archive) is reachable once the player has the brass key (found at the wind cliffs, after solving puzzle 2) to open the village hub's archive hatch. Its final document — the lantern-keeper's real reason for leaving — is gated on `fragment_amber_shore_recovered`, so reading it only makes narrative sense after the scattering account, resolving the "implementation detail" flagged in the original draft.
+5. Relighting the central lantern requires all three fragments (`PuzzleProgression.CanRelightLantern`) and triggers the main ending; if the archive's final record was also read first, the ending shows the optional variation instead (`WorldState.ReachedOptionalEndingVariation`) — this is the optional ending variation's trigger condition.
 
-## What's NOT decided yet (flag for follow-up before writing final dialogue)
+## What was intentionally left open (and stayed open)
 
-- Player character's own background/reason for traveling through the valley — intentionally blank; needs a decision before VO/dialogue references it.
-- Exact wording of all NPC dialogue trees beyond the one sample in `Content/Data/dialogue/cartographer_intro.json`.
-- The optional ending variation's exact trigger condition.
+- **Player character's own background/reason for traveling through the valley** — still intentionally blank. No dialogue references it, by design: the theme ("the player's role is witness and archivist, not savior") doesn't need the player to explain themselves, and leaving it unstated keeps the traveler a blank enough vessel for the framing to work. Revisit only if a future pass wants first-person player dialogue lines.
+- Exact final dialogue wording is, inevitably, a first pass rather than a polished literary one — see all five trees under `Content/Data/dialogue/` for the actual text now in place.

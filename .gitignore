@@ -6,3 +6,4 @@ TestResults/
 Content/bin/
 Content/obj/
 *.tmbuildinfo
+publish/

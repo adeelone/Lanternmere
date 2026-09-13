@@ -1,44 +1,62 @@
 # Lanternmere roadmap
 
-Tracks what this scaffold actually built vs. what `BRIEF.md` requires. Keep this honest — it's the input to `AUDIT.md`.
+Tracks what's built vs. what `BRIEF.md` requires. Keep this honest — it's the input to `AUDIT.md`.
+
+## Code-quality / maintainability pass (2026-08-31)
+
+See `CODE_QUALITY_AUDIT.md` for the full findings, impact/risk analysis, and cleanup plan. Summary of what changed:
+
+- Removed 7 confirmed-dead members (zero callers anywhere in the repo): `WorldState.SeenDialogueNodeIds` (write-only state whose own doc comment described behavior that was never implemented), `DiscoveryDefinition.UnlockedByFlag`, `ItemDatabase.Get`/`DiscoveryDatabase.Get`, `WorldState.RemoveItem`, `NpcPlacementDef.DialogueIdAfterFlag`/`DialogueAfterFlagName` (an unused second mechanism for something the single-tree `DialogueCondition`/`FallbackNext` pattern already fully covers)
+- Consolidated a duplicated word-wrap text renderer (`DialogueScene`/`JournalScene`) into `Systems/TextRenderer.cs`
+- Fixed two redundant-recompute bugs: `SaveSlotScene` was re-reading and re-deserializing all 3 save files from disk on every single Draw call (60x/sec) instead of once; `JournalScene`'s discovery list was recomputed via LINQ twice per frame instead of once
+- Fixed a real gameplay bug found while investigating item pickups: interactables that grant an item never disappeared once collected, so a player could re-examine an already-collected pickup indefinitely
+- Turned three "built but never connected" pieces of code into working features instead of deleting them: per-item pickup icons (key/leaf/glass shapes, previously all pickups used the same generic circle), a footstep sound cadence while moving and a page-turn cue on opening Journal/Map/Inventory (both were synthesized at startup and never played), and full gamepad rebinding (the UI, and — this was the real gap — actual settings persistence, which didn't exist at all before)
+- Found and fixed a real bug in the rebind capture logic itself while wiring up the above: the key/button used to *open* the rebind menu was often still physically held on the very next frame, which could silently rebind an action to it by accident
+- Added `InputManagerTests` (previously zero test coverage for that class) and a content-invariant test asserting exactly one interactable is flagged as the brief's required optional secret (`IsOptionalSecret` was previously dead metadata — set in content, read by nothing)
+- Net result: 58 passing tests (was 53), 0 build warnings/errors, steady 60fps reconfirmed in the densest region with no regression, full Release publish reconfirmed working
 
 ## Done in this pass
 
-- [x] Project structure split into `Lanternmere.Core` (pure logic, unit-testable) and `Lanternmere` (MonoGame executable) — see README "Project layout" for why
-- [x] Scene/state stack (`Core/IScene.cs`, `Core/SceneManager.cs`) with Title → Gameplay → Pause wired and working; Pause overlays Gameplay without discarding its state
-- [x] Fixed-timestep game loop (`IsFixedTimeStep = true`, 60Hz) explicitly set in `Game1`
-- [x] Eight-direction movement with acceleration/deceleration (`Entities/Player.cs`)
-- [x] AABB tile/object collision with per-axis slide resolution, no slopes (`Systems/CollisionSystem.cs`), unit tested
-- [x] Rebindable keyboard + gamepad input abstraction (`Systems/InputManager.cs`) with defaults, persisted to settings
-- [x] Settings persistence (`Core/GameSettings.cs`): volume levels, accessibility toggles (reduced motion/shake/flash, high contrast, text speed/instant text), resolution/fullscreen, UI scale, key/gamepad bindings
-- [x] Versioned, atomic, backup-and-recover save system (`Core/SaveSystem.cs`) — 3 slots, corruption detection, backup fallback — with passing round-trip and corruption-recovery tests
-- [x] World state model (`Core/WorldState.cs`): flags, puzzle states, journal/inventory/shortcut lists, playtime, ending flags
-- [x] Developer-only debug overlay, compiled out entirely in non-DEBUG builds (`Core/DebugOverlay.cs`)
-- [x] Data-driven content stubs: one map descriptor, one dialogue tree, an items file, a discoveries file (`Content/Data/`)
-- [x] Asset manifest (`ASSET_MANIFEST.md`) — currently empty/honest since no art or audio has been produced
-- [x] Narrative bible draft and full puzzle specs for all 3 required puzzles (`docs/NARRATIVE_BIBLE.md`, `docs/PUZZLES.md`)
-- [x] 10 passing xUnit tests; `dotnet build` succeeds with 0 warnings/0 errors; a 15-second headless run under Xvfb started without crashing
+Everything from the prior architecture-only pass, plus:
 
-## Not built yet (ordered roughly by suggested priority)
+- Data-driven region format + loader + cross-region validator (`Lanternmere.Core.Content.RegionLoader`), replacing the placeholder bounded room — see `docs/REGION_FORMAT.md`
+- All 5 regions built: village hub, rain garden, wind cliffs, amber shore, archive (optional secret) — generated by `tools/ContentGen` and self-validated (0 issues)
+- Camera: follow, region-bounds clamping, screen shake with a `ReducedShake`-respecting disable, wired to real puzzle-failure feedback
+- Dialogue system: `DialogueTree`/`DialogueRunner` (conditions, branching choices, per-node side effects) + `DialogueScene` (typewriter reveal respecting text-speed/instant-text settings, choice selection, toggleable history log)
+- 5 NPCs with real arcs, first-time/repeat/solved-state dialogue variation, and (Ferryperson) a cross-region-gated deeper conversation
+- All 3 required puzzles implemented (`Lanternmere.Core.Puzzles`) exactly per `docs/PUZZLES.md`'s state machines, plus the optional archive secret, all wired into regions and covered by unit tests including save/reload mid-attempt
+- Puzzle → story-progression wiring (`PuzzleProgression`) extracted into testable Core code rather than living untested inside the rendering layer
+- Inventory, Journal (all unlocked discoveries, replayable any time), and a schematic fog-of-discovery Map (visited-only region reveal, not a GPS arrow)
+- Procedural placeholder art (`TextureFactory`) and audio (`AudioSynth`/`AudioLibrary`/`AudioManager` with real music/ambience crossfades and independent volume buses) — see `ASSET_MANIFEST.md`
+- Full save integration: autosave at safe region-entry/puzzle-solved points only (never mid-transition), manual save, Continue (most recent slot)/Load (slot picker with metadata), corrupted-save recovery screen
+- Real settings UI: volume sliders, text speed/instant text, reduced motion/shake/flash + high-contrast toggles (shake and high-contrast are wired to actual effects; motion/flash have no effects yet to gate — see `AUDIT.md`), fullscreen, UI scale, and a keyboard/gamepad rebind submenu
+- Title (New/Continue/Load/Settings/Credits/Quit), Pause (Resume/Save/Settings/Quit-with-confirm), Credits + post-game "continue exploring" or "return to title", main ending + optional ending variation
+- Controller-disconnected and missing-content-error screens, both actually wired into `Game1` (not just present as unused classes)
+- A real .NET 8 SDK install + full build/test/publish pipeline verified on Windows in this environment: `dotnet build` (0 warnings/errors across all 4 projects), `dotnet test` (53 passing), a Debug launch (confirmed rendering a real region correctly), and a Release `dotnet publish -r win-x64` launched as a standalone packaged `.exe` outside the dev tree
+- `tools/ContentGen`: a schema-correct content generator + self-validator, replacing hand-typed JSON as the content-authoring path
+- GitHub Actions CI (`.github/workflows/ci.yml`): cross-platform Core+test job (Ubuntu/Windows) plus a Windows job that also builds/tests/publishes the full game — not yet run for real on GitHub's runners, since this repo hasn't been pushed there in this pass
+- `scripts/clean-build.ps1` / `.sh`, both verified to actually run end-to-end in this environment
+- Fixed a real pre-existing bug: `PauseScene.DrawsOverPreviousScene` was `false`, which (per `SceneManager.Draw`'s actual walk-the-stack logic) meant the frozen gameplay scene was never redrawn beneath the pause overlay, contradicting its own doc comment. Now `true`.
+- Fixed a real pre-existing test-isolation bug: `SaveSystemTests` tried to redirect `GameSettings.GetSaveDirectory()` via the `APPDATA` env var, which `Environment.GetFolderPath(SpecialFolder.ApplicationData)` does not reliably honor on Windows. Replaced with a direct, `[ThreadStatic]` test-only override property.
+- Removed the test project's pointless `ProjectReference` to the full MonoGame executable (`src/Lanternmere/Lanternmere.csproj`) — nothing in the tests used it, and keeping it meant `dotnet test` needed MonoGame's native libs and a font-build-capable machine even for pure-logic tests. Now Core-only, confirmed to build/test on both Windows and (via CI) Ubuntu.
+- Added `DevLaunchOptions` + `Game1` wiring (`--region`, `--scene`, `--perflog`, all `#if DEBUG`-gated and absent from Release): jumps straight into any region or UI overlay scene, and logs real min/avg/max FPS over N seconds then exits. Built specifically to enable real visual/performance verification in an environment where scripting synthetic keyboard input into the game window proved unreliable — see AUDIT.md's "Manual/visual verification" section for the full story, including two verification-tooling bugs that had to be found and fixed before it worked.
+- **Every region and every core UI scene visually confirmed** with real screenshots (window-scoped `PrintWindow` captures, never full-desktop) after fixing a DPI-virtualization bug in the capture tooling that was silently cropping captures to the top-left quarter of the real frame.
+- **Real bug found via that visual verification and fixed**: the em-dash character (and other general punctuation — en dashes, curly quotes, ellipsis) rendered as a `*` fallback glyph because `Content/Fonts/*.spritefont` only declared a Latin-1 `CharacterRegion`. At least 9 lines of real dialogue/discovery prose use em-dashes. Fixed by adding a second `CharacterRegion` (U+2010–U+2027) to both font files.
+- **Real performance data captured**: `--perflog` measured a steady 60.0 min/avg/max fps in village_hub, wind_cliffs (the densest/widest region, 481 frames sampled), and amber_shore, all at 1280×720 — no frame drops observed.
 
-1. **Real region/map loading.** Gameplay currently runs in one placeholder bounded room (`Scenes/GameplayScene.cs` hardcodes wall rectangles from the viewport). No Tiled (.tmx) loading exists yet despite `Content/Data/maps/village_hub.json` referencing a `tiledMapPath`.
-2. **The three required puzzles.** Fully specced in `docs/PUZZLES.md` (state machines, reset behavior, accessibility alternatives, test cases) but none are implemented.
-3. **NPCs and dialogue.** Only one sample dialogue tree exists (`cartographer_intro.json`) and there's no dialogue-rendering scene, no branching-choice UI, and no dialogue history.
-4. **Journal, map, and inventory UI.** `WorldState` tracks the underlying lists; there's no screen to view them.
-5. **Sprite/tile art and animation.** Gameplay draws solid-color rectangles for the player and walls. No SpriteFont is loaded yet either (`DebugOverlay.Draw` takes a nullable font and no-ops without one).
-6. **Audio.** No music, ambience, or effects; no volume mixing wired to the `GameSettings` volume fields yet (the settings exist but nothing reads them into an actual `SoundEffectInstance`/`Song` volume).
-7. **Camera follow, room transitions, screen shake (with disable option).** Not implemented — the placeholder room is small enough that camera follow hasn't been needed yet.
-8. **Title/Pause/Settings menu UI.** Input handling for Confirm/Cancel/Pause exists; there's no actual menu rendering, so these scenes currently just draw solid overlays.
-9. **Save slot picker UI, Continue/Load from Title.** `SaveSystem` supports 3 slots; `TitleScene` currently only supports New Game.
-10. **Controller-disconnected, missing-content-error, and other required error states.**
-11. **Windows/macOS packaged-build smoke tests.** Only built/run on Linux (this scaffold's dev environment) so far, including one headless Xvfb smoke run — real Windows/macOS packaging is unverified.
-12. **Automated map validation** (missing spawn points, bad destinations, duplicate IDs) — not applicable yet since there's no real map loader.
-13. **CI.** Not set up.
-14. **Cross-region puzzle gating** (e.g. Puzzle 2 requiring a rain-garden visit first) — flagged as a TODO directly in `docs/PUZZLES.md`; not yet implemented in code.
-15. **More tide-glass items** — `docs/PUZZLES.md` puzzle 3 needs 3 tide-glass pieces; only 1 is defined in `Content/Data/items/items.json`.
+## Known gaps (ordered roughly by what a next pass should tackle first)
 
-## Explicitly deferred per the brief (not bugs)
+1. **No animation.** Every sprite is a single static procedurally-generated texture — no idle/walk cycles, no water/foliage motion, no lantern lit/dark sprite states, no transition or finale visual effects. This is the largest gap versus the brief's art requirements; see `docs/ART_DIRECTION.md`.
+2. **Amber shore altar interaction is simplified.** Interacting with a slot auto-tries whichever carried shard isn't yet correctly placed, rather than an explicit item-select UI. The puzzle *logic* is fully correct and tested regardless (`AmberShorePuzzleTests`) — this is a physical-interaction polish gap, not a logic gap. See `docs/PUZZLES.md`.
+3. **`ReducedMotion` and `ReducedFlash` settings persist but gate nothing**, because no motion or flash effects exist anywhere yet to disable. `ReducedShake` and `HighContrastInteractionIndicators` *are* wired to real effects.
+4. **No confirmation-dialog component**, only one inline confirm-by-pressing-twice case (Pause's "Quit to Title").
+5. **Real Aseprite/Tiled pipeline not used** — a deliberate substitution, not an oversight.
+6. **macOS packaged build untested** — no macOS machine available in this environment.
+7. **No real gamepad/controller hardware tested.** As of the 2026-08-31 pass, gamepad rebinding is software-complete (shared UI with keyboard rebinding, real settings persistence, unit tested) — the only remaining gap is that no physical controller has ever been plugged in to confirm it end to end.
+8. **CI is written but not yet run for real** — `.github/workflows/ci.yml` exists and mirrors commands verified locally, but this repo hasn't been pushed to GitHub in this pass.
+9. **Two screens share proven rendering patterns but weren't independently screenshotted**: `SaveCorruptedScene` and `ControllerDisconnectedScene`, since triggering them for real needs a genuinely corrupted save file or an actual gamepad disconnect event rather than the region/scene dev-launch mechanism used for everything else.
 
-- Full 30–60 minute playable content (this pass is architecture only)
-- Final custom art/audio — placeholder programmer art only, honestly labeled in `ASSET_MANIFEST.md`
-- Store/trademark/domain clearance
+## Explicitly out of scope (not bugs)
+
+- Final, non-placeholder art and audio
+- Store/trademark/domain clearance (a legal/business step, not a coding task)

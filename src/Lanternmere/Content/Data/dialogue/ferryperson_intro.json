@@ -1,0 +1,142 @@
+{
+  "Id": "ferryperson_intro",
+  "NpcId": "the_ferryperson",
+  "Nodes": [
+    {
+      "Id": "start",
+      "Speaker": "The Ferryperson",
+      "Text": "You picked a strange place to start a conversation. Most people don\u0027t, here.",
+      "Next": "deflect",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": "met_the_ferryperson",
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "met_the_ferryperson",
+        "Negate": true
+      },
+      "FallbackNext": "gate_ready"
+    },
+    {
+      "Id": "deflect",
+      "Speaker": "The Ferryperson",
+      "Text": "Ask me something else. I don\u0027t talk about the landing much. Not yet.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "gate_ready",
+      "Speaker": "The Ferryperson",
+      "Text": "You\u0027ve seen enough of this valley now. Fine \u2014 ask.",
+      "Next": "account_offer",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "both_prior_fragments_recovered",
+        "Negate": false
+      },
+      "FallbackNext": "deflect_again"
+    },
+    {
+      "Id": "deflect_again",
+      "Speaker": "The Ferryperson",
+      "Text": "Come back when you understand more of this place.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "account_offer",
+      "Speaker": "The Ferryperson",
+      "Text": "Go on, then.",
+      "Next": null,
+      "Choices": [
+        {
+          "Text": "Tell me about the scattering.",
+          "Next": "scattering_account",
+          "Condition": null,
+          "SetsFlag": null
+        },
+        {
+          "Text": "What\u0027s the tide-glass pattern?",
+          "Next": "pattern_clue",
+          "Condition": null,
+          "SetsFlag": null
+        },
+        {
+          "Text": "Not now.",
+          "Next": "end",
+          "Condition": null,
+          "SetsFlag": null
+        }
+      ],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "scattering_account",
+      "Speaker": "The Ferryperson",
+      "Text": "The drought took the garden first. Then the cliffwatch had nothing left to warn about. We didn\u0027t leave all at once \u2014 we just stopped calling it home, one boat at a time.",
+      "Next": "account_offer",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": "journal_ferryperson_note",
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "pattern_clue",
+      "Speaker": "The Ferryperson",
+      "Text": "Dawn-glass faces the sunrise post. Dusk-glass, the far one. The deep-glass sits between them, same as the water does.",
+      "Next": "account_offer",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "end",
+      "Speaker": "",
+      "Text": "",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    }
+  ],
+  "Start": {
+    "Id": "start",
+    "Speaker": "The Ferryperson",
+    "Text": "You picked a strange place to start a conversation. Most people don\u0027t, here.",
+    "Next": "deflect",
+    "Choices": [],
+    "EndsConversation": false,
+    "SetsFlag": "met_the_ferryperson",
+    "UnlocksDiscoveryId": null,
+    "Condition": {
+      "RequiresFlag": "met_the_ferryperson",
+      "Negate": true
+    },
+    "FallbackNext": "gate_ready"
+  }
+}

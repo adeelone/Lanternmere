@@ -43,6 +43,13 @@ public sealed class SceneManager
         Push(scene);
     }
 
+    /// <summary>Clears the entire stack and pushes a single new scene — used for "quit to title" from deep inside gameplay/pause/dialogue.</summary>
+    public void ReplaceAll(IScene scene)
+    {
+        while (_stack.Count > 0) Pop();
+        Push(scene);
+    }
+
     public void Update(GameTime gameTime)
     {
         Current?.Update(gameTime);

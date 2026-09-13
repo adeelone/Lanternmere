@@ -12,7 +12,6 @@ namespace Lanternmere.Tests;
 /// </summary>
 public class SaveSystemTests : IDisposable
 {
-    private readonly string _originalAppData;
     private readonly string _tempDir;
 
     public SaveSystemTests()
@@ -20,19 +19,19 @@ public class SaveSystemTests : IDisposable
         _tempDir = Path.Combine(Path.GetTempPath(), "lanternmere-tests-" + Guid.NewGuid());
         Directory.CreateDirectory(_tempDir);
 
-        // GameSettings.GetSaveDirectory() reads ApplicationData; redirect it
-        // per-test via the environment variable that SpecialFolder resolves
-        // from on this platform, so tests never collide with each other or
-        // a real save.
-        _originalAppData = Environment.GetEnvironmentVariable("APPDATA") ?? "";
-        Environment.SetEnvironmentVariable("APPDATA", _tempDir);
-        Environment.SetEnvironmentVariable("HOME", _tempDir); // covers Linux/macOS resolution path too
-        Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", _tempDir);
+        // GameSettings.GetSaveDirectory() honors this test-only override
+        // directly, rather than relying on the APPDATA environment
+        // variable — on Windows, Environment.GetFolderPath(ApplicationData)
+        // reads the OS's known-folder registration and does NOT reliably
+        // follow an in-process APPDATA override, which let a real save
+        // file leak into an "isolated" test once one existed on the
+        // machine running these tests.
+        GameSettings.SaveDirectoryOverrideForTests = _tempDir;
     }
 
     public void Dispose()
     {
-        Environment.SetEnvironmentVariable("APPDATA", _originalAppData);
+        GameSettings.SaveDirectoryOverrideForTests = null;
         try { Directory.Delete(_tempDir, recursive: true); } catch { /* best-effort cleanup */ }
     }
 

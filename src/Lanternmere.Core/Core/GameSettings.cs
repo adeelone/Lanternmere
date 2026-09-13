@@ -39,8 +39,32 @@ public sealed class GameSettings
     private static string GetSettingsPath() =>
         Path.Combine(GetSaveDirectory(), "settings.json");
 
+    /// <summary>
+    /// Test-only override. On Windows, <see cref="Environment.GetFolderPath"/>
+    /// for ApplicationData reads the OS's known-folder registration rather
+    /// than the APPDATA environment variable, so setting APPDATA alone does
+    /// NOT reliably redirect save-directory tests on that platform. Tests
+    /// set this directly instead; see SaveSystemTests.cs. [ThreadStatic]
+    /// because xUnit runs different test classes in parallel on different
+    /// threads by default — a plain static field here caused one test
+    /// class's override to race with another's mid-Save().
+    /// </summary>
+    [ThreadStatic]
+    private static string? _saveDirectoryOverrideForTests;
+    public static string? SaveDirectoryOverrideForTests
+    {
+        get => _saveDirectoryOverrideForTests;
+        set => _saveDirectoryOverrideForTests = value;
+    }
+
     public static string GetSaveDirectory()
     {
+        if (SaveDirectoryOverrideForTests is not null)
+        {
+            Directory.CreateDirectory(SaveDirectoryOverrideForTests);
+            return SaveDirectoryOverrideForTests;
+        }
+
         var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         // Windows: %AppData%/Lanternmere. macOS/Linux under MonoGame DesktopGL
         // typically resolve ApplicationData to ~/.config — both are

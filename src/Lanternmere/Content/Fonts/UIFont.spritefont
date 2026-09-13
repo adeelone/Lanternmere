@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file contains an xml description of a font, and will be read by the XNA
+Framework Content Pipeline. Following this file's documentation, this
+generates a SpriteFont object which can be used to draw text on screen.
+
+Placeholder font: rasterized at build time from a system-installed font
+(see ASSET_MANIFEST.md). Fine for a prototype build on the machine that
+built it; a final release should replace FontName with an embeddable,
+properly licensed font file so packaged builds don't depend on what fonts
+happen to be installed on the build machine.
+-->
+<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
+  <Asset Type="Graphics:FontDescription">
+    <FontName>Segoe UI</FontName>
+    <Size>16</Size>
+    <Spacing>0</Spacing>
+    <UseKerning>true</UseKerning>
+    <Style>Regular</Style>
+    <DefaultCharacter>*</DefaultCharacter>
+    <CharacterRegions>
+      <CharacterRegion>
+        <Start>&#32;</Start>
+        <End>&#255;</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <!-- "General Punctuation" block: hyphen/en/em dashes, curly quotes,
+             ellipsis — all used in Lanternmere's dialogue/discovery prose. -->
+        <Start>&#8208;</Start>
+        <End>&#8231;</End>
+      </CharacterRegion>
+    </CharacterRegions>
+  </Asset>
+</XnaContent>

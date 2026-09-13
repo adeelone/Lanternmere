@@ -30,7 +30,7 @@ public enum LoadResult
 public static class SaveSystem
 {
     public const int CurrentSchemaVersion = 1;
-    private const int SlotCount = 3;
+    public const int SlotCount = 3;
 
     private static string SlotPath(int slot) => Path.Combine(GameSettings.GetSaveDirectory(), $"save{slot}.json");
     private static string BackupPath(int slot) => Path.Combine(GameSettings.GetSaveDirectory(), $"save{slot}.bak.json");
@@ -74,6 +74,19 @@ public static class SaveSystem
 
     public static (LoadResult result, WorldState? world) Load(int slot)
     {
+        var (result, envelope) = LoadEnvelope(slot);
+        return (result, envelope is null ? null : Migrate(envelope));
+    }
+
+    /// <summary>Like <see cref="Load"/> but also surfaces when the save was written, for a save-slot picker UI that shows "last played" metadata without needing a separate read.</summary>
+    public static (LoadResult result, DateTime? savedAtUtc, WorldState? world) LoadWithMetadata(int slot)
+    {
+        var (result, envelope) = LoadEnvelope(slot);
+        return (result, envelope?.SavedAtUtc, envelope is null ? null : Migrate(envelope));
+    }
+
+    private static (LoadResult result, SaveFileEnvelope? envelope) LoadEnvelope(int slot)
+    {
         if (slot < 0 || slot >= SlotCount) throw new ArgumentOutOfRangeException(nameof(slot));
 
         var primaryPath = SlotPath(slot);
@@ -82,7 +95,7 @@ public static class SaveSystem
         var primary = TryDeserialize(SafeRead(primaryPath));
         if (primary is not null)
         {
-            return (LoadResult.Success, Migrate(primary));
+            return (LoadResult.Success, primary);
         }
 
         // Primary is corrupted — fall back to the backup copy rather than
@@ -93,7 +106,7 @@ public static class SaveSystem
             var backup = TryDeserialize(SafeRead(backupPath));
             if (backup is not null)
             {
-                return (LoadResult.RecoveredFromBackup, Migrate(backup));
+                return (LoadResult.RecoveredFromBackup, backup);
             }
         }
 

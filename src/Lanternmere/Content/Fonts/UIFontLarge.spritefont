@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- See UIFont.spritefont for notes on this being a placeholder, build-machine-rasterized font. -->
+<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
+  <Asset Type="Graphics:FontDescription">
+    <FontName>Segoe UI</FontName>
+    <Size>32</Size>
+    <Spacing>0</Spacing>
+    <UseKerning>true</UseKerning>
+    <Style>Regular</Style>
+    <DefaultCharacter>*</DefaultCharacter>
+    <CharacterRegions>
+      <CharacterRegion>
+        <Start>&#32;</Start>
+        <End>&#255;</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <!-- "General Punctuation" block: hyphen/en/em dashes, curly quotes, ellipsis. -->
+        <Start>&#8208;</Start>
+        <End>&#8231;</End>
+      </CharacterRegion>
+    </CharacterRegions>
+  </Asset>
+</XnaContent>

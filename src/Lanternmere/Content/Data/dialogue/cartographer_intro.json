@@ -1,28 +1,124 @@
 {
-  "id": "cartographer_intro",
-  "npcId": "the_cartographer",
-  "nodes": [
+  "Id": "cartographer_intro",
+  "NpcId": "the_cartographer",
+  "Nodes": [
     {
-      "id": "start",
-      "speaker": "The Cartographer",
-      "text": "The lantern's gone dark, and half my map with it. You're not from here, are you? Good. Maybe you'll notice what we stopped seeing.",
-      "next": "offer_task"
+      "Id": "start",
+      "Speaker": "The Cartographer",
+      "Text": "The lantern\u0027s gone dark, and half my map with it. You\u0027re not from here, are you? Good. Maybe you\u0027ll notice what we stopped seeing.",
+      "Next": "offer_task",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": "met_the_cartographer",
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "met_the_cartographer",
+        "Negate": true
+      },
+      "FallbackNext": "check_ready"
     },
     {
-      "id": "offer_task",
-      "speaker": "The Cartographer",
-      "text": "Three places lost their names when the light went out. Bring back what you find, and I'll help you write them down again.",
-      "choices": [
-        { "text": "Where should I start?", "next": "hint_rain_garden" },
-        { "text": "I'll figure it out myself.", "next": "end" }
-      ]
+      "Id": "check_ready",
+      "Speaker": "The Cartographer",
+      "Text": "Three names recovered. I think the lantern\u0027s just waiting on you now.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "all_fragments_recovered",
+        "Negate": false
+      },
+      "FallbackNext": "repeat_greeting"
     },
     {
-      "id": "hint_rain_garden",
-      "speaker": "The Cartographer",
-      "text": "The rain garden's closest, past the gate. Something's still growing there, which is more than I can say for the rest of us.",
-      "next": "end"
+      "Id": "repeat_greeting",
+      "Speaker": "The Cartographer",
+      "Text": "Still finding your way around? The rain garden\u0027s past the gate, if you haven\u0027t been.",
+      "Next": "offer_task_repeat",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
     },
-    { "id": "end", "speaker": "", "text": "", "endsConversation": true }
-  ]
+    {
+      "Id": "offer_task",
+      "Speaker": "The Cartographer",
+      "Text": "Three places lost their names when the light went out. Bring back what you find, and I\u0027ll help you write them down again.",
+      "Next": null,
+      "Choices": [
+        {
+          "Text": "Where should I start?",
+          "Next": "hint_rain_garden",
+          "Condition": null,
+          "SetsFlag": null
+        },
+        {
+          "Text": "I\u0027ll figure it out myself.",
+          "Next": "end",
+          "Condition": null,
+          "SetsFlag": null
+        }
+      ],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "hint_rain_garden",
+      "Speaker": "The Cartographer",
+      "Text": "The rain garden\u0027s closest, past the gate. Something\u0027s still growing there, which is more than I can say for the rest of us.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": "journal_cartographer_note",
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "offer_task_repeat",
+      "Speaker": "The Cartographer",
+      "Text": "Anything you find out there, bring it back here.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "end",
+      "Speaker": "",
+      "Text": "",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    }
+  ],
+  "Start": {
+    "Id": "start",
+    "Speaker": "The Cartographer",
+    "Text": "The lantern\u0027s gone dark, and half my map with it. You\u0027re not from here, are you? Good. Maybe you\u0027ll notice what we stopped seeing.",
+    "Next": "offer_task",
+    "Choices": [],
+    "EndsConversation": false,
+    "SetsFlag": "met_the_cartographer",
+    "UnlocksDiscoveryId": null,
+    "Condition": {
+      "RequiresFlag": "met_the_cartographer",
+      "Negate": true
+    },
+    "FallbackNext": "check_ready"
+  }
 }

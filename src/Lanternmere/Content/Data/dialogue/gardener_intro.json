@@ -1,0 +1,75 @@
+{
+  "Id": "gardener_intro",
+  "NpcId": "the_gardener",
+  "Nodes": [
+    {
+      "Id": "start",
+      "Speaker": "The Gardener",
+      "Text": "You\u0027re new. Careful where you step \u2014 the ground remembers who waters it, and who doesn\u0027t.",
+      "Next": "explain_plots",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": "met_the_gardener",
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "met_the_gardener",
+        "Negate": true
+      },
+      "FallbackNext": "check_solved"
+    },
+    {
+      "Id": "check_solved",
+      "Speaker": "The Gardener",
+      "Text": "The garden found its name again because of you. Amaranth Hollow. Say it enough and maybe it\u0027ll stick this time.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "fragment_rain_garden_recovered",
+        "Negate": false
+      },
+      "FallbackNext": "repeat"
+    },
+    {
+      "Id": "explain_plots",
+      "Speaker": "The Gardener",
+      "Text": "Four plots, four different kinds of thirsty. Start with the one that needs it most.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": "journal_gardener_note",
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "repeat",
+      "Speaker": "The Gardener",
+      "Text": "Water the driest plot first. Always the driest.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    }
+  ],
+  "Start": {
+    "Id": "start",
+    "Speaker": "The Gardener",
+    "Text": "You\u0027re new. Careful where you step \u2014 the ground remembers who waters it, and who doesn\u0027t.",
+    "Next": "explain_plots",
+    "Choices": [],
+    "EndsConversation": false,
+    "SetsFlag": "met_the_gardener",
+    "UnlocksDiscoveryId": null,
+    "Condition": {
+      "RequiresFlag": "met_the_gardener",
+      "Negate": true
+    },
+    "FallbackNext": "check_solved"
+  }
+}

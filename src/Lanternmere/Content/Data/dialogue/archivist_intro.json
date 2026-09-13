@@ -1,0 +1,97 @@
+{
+  "Id": "archivist_intro",
+  "NpcId": "the_archivist",
+  "Nodes": [
+    {
+      "Id": "start",
+      "Speaker": "The Archivist",
+      "Text": "You found the stairs, then. Not many do, and fewer come back twice.",
+      "Next": "offer",
+      "Choices": [],
+      "EndsConversation": false,
+      "SetsFlag": "met_the_archivist",
+      "UnlocksDiscoveryId": null,
+      "Condition": {
+        "RequiresFlag": "met_the_archivist",
+        "Negate": true
+      },
+      "FallbackNext": "repeat"
+    },
+    {
+      "Id": "offer",
+      "Speaker": "The Archivist",
+      "Text": "Ask, if you\u0027d like.",
+      "Next": null,
+      "Choices": [
+        {
+          "Text": "What is this place?",
+          "Next": "explain",
+          "Condition": null,
+          "SetsFlag": null
+        },
+        {
+          "Text": "I\u0027ll read for myself.",
+          "Next": "end",
+          "Condition": null,
+          "SetsFlag": null
+        }
+      ],
+      "EndsConversation": false,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "explain",
+      "Speaker": "The Archivist",
+      "Text": "Everything anyone here chose to write down before they left. I keep it, even knowing most of it will never be read again. You\u0027re reading it. That\u0027s enough.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": "journal_archivist_note",
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "repeat",
+      "Speaker": "The Archivist",
+      "Text": "The pages are still here. So am I.",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    },
+    {
+      "Id": "end",
+      "Speaker": "",
+      "Text": "",
+      "Next": null,
+      "Choices": [],
+      "EndsConversation": true,
+      "SetsFlag": null,
+      "UnlocksDiscoveryId": null,
+      "Condition": null,
+      "FallbackNext": null
+    }
+  ],
+  "Start": {
+    "Id": "start",
+    "Speaker": "The Archivist",
+    "Text": "You found the stairs, then. Not many do, and fewer come back twice.",
+    "Next": "offer",
+    "Choices": [],
+    "EndsConversation": false,
+    "SetsFlag": "met_the_archivist",
+    "UnlocksDiscoveryId": null,
+    "Condition": {
+      "RequiresFlag": "met_the_archivist",
+      "Negate": true
+    },
+    "FallbackNext": "repeat"
+  }
+}

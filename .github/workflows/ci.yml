@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Lanternmere.Core is pure logic (no content pipeline, no GraphicsDevice)
+  # so it and the test suite can build/run on any OS. This is the fast
+  # cross-platform signal.
+  test-core-cross-platform:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - run: dotnet test test/Lanternmere.Tests/Lanternmere.Tests.csproj --configuration Release
+
+  # The full game (MonoGame DesktopGL + content pipeline font build) is
+  # only verified on Windows in this repo's CI, matching AUDIT.md's honest
+  # scope — macOS packaging is documented as unverified, not silently
+  # assumed to work.
+  build-and-publish-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - run: dotnet build Lanternmere.sln --configuration Release
+      - run: dotnet test test/Lanternmere.Tests/Lanternmere.Tests.csproj --configuration Release
+      - run: dotnet publish src/Lanternmere/Lanternmere.csproj -c Release -r win-x64 --self-contained false -o publish/win-x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lanternmere-win-x64
+          path: publish/win-x64
