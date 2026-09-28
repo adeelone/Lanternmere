@@ -50,6 +50,7 @@ public sealed class RegionScene : IScene
     private string? _toastText;
     private float _toastSeconds;
     private float _footstepTimer;
+    private float _visualTime;
     private const float FootstepIntervalSeconds = 0.33f;
     private const float FootstepMinSpeedSquared = 100f; // ~10px/s — filters out the near-zero deceleration tail
 
@@ -139,7 +140,21 @@ public sealed class RegionScene : IScene
         Autosave();
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        // Every region creates its own procedural textures. Region transitions
+        // replace scenes repeatedly, so release those GPU resources here rather
+        // than retaining one full set for every place the player has visited.
+        _groundTile.Dispose();
+        _wallTile.Dispose();
+        _playerTexture.Dispose();
+        _landmarkIcon.Dispose();
+        _itemIcon.Dispose();
+        foreach (var texture in _npcTextures.Values) texture.Dispose();
+        foreach (var texture in _itemIconsByItemId.Values) texture.Dispose();
+        _npcTextures.Clear();
+        _itemIconsByItemId.Clear();
+    }
 
     private void BuildCollision()
     {
@@ -172,6 +187,10 @@ public sealed class RegionScene : IScene
     {
         _input.Update();
         _world.PlaytimeSeconds += gameTime.ElapsedGameTime.TotalSeconds;
+        if (!_settings.ReducedMotion)
+        {
+            _visualTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        }
 
         if (_toastSeconds > 0f) _toastSeconds -= (float)gameTime.ElapsedGameTime.TotalSeconds;
         else _toastText = null;
@@ -389,7 +408,6 @@ public sealed class RegionScene : IScene
             {
                 var puzzle = new AmberShorePuzzle(_world);
                 var slot = def.PuzzlePieceIndex;
-                var correctItem = slot >= 0 && slot < AmberShorePuzzle.CorrectSlotItems.Length ? AmberShorePuzzle.CorrectSlotItems[slot] : null;
 
                 if (puzzle.IsLocked)
                 {
@@ -397,27 +415,53 @@ public sealed class RegionScene : IScene
                     return;
                 }
 
-                // Simplified single-button placement: try whichever carried
-                // shard the player is holding against this slot. A full
-                // drag/select item picker is a natural next polish pass —
-                // see ROADMAP.md.
-                var carriedShard = _world.InventoryItemIds.FirstOrDefault(id => id.StartsWith("tide_glass_shard_") && puzzle.ItemInSlot(slot) != id);
-                if (carriedShard is null)
+                var placedItem = puzzle.ItemInSlot(slot);
+                var itemsInOtherSlots = Enumerable.Range(0, AmberShorePuzzle.SlotCount)
+                    .Where(otherSlot => otherSlot != slot)
+                    .Select(puzzle.ItemInSlot)
+                    .Where(itemId => itemId is not null)
+                    .ToHashSet(StringComparer.Ordinal);
+                var carriedShards = _world.InventoryItemIds
+                    .Where(id => id.StartsWith("tide_glass_shard_", StringComparison.Ordinal)
+                        && !itemsInOtherSlots.Contains(id)
+                        && !string.Equals(id, placedItem, StringComparison.Ordinal))
+                    .OrderBy(id => id, StringComparer.Ordinal)
+                    .ToList();
+
+                if (carriedShards.Count == 0 && placedItem is null)
                 {
                     ShowToast("You have no tide-glass shard to try here.");
                     return;
                 }
 
-                var feedback = puzzle.PlaceGlass(slot, carriedShard);
-                HandlePuzzleFeedback(feedback, null);
-                if (feedback == PuzzleFeedback.Solved)
-                {
-                    PuzzleProgression.OnAmberShoreSolved(_world);
-                    Autosave();
-                }
+                _manager.Push(new AltarSelectionScene(
+                    _input, _pixel, _font, _content, slot, carriedShards, placedItem,
+                    itemId => PlaceGlassInAltarSlot(slot, itemId),
+                    () => RemoveGlassFromAltarSlot(slot)));
                 break;
             }
         }
+    }
+
+    private void PlaceGlassInAltarSlot(int slot, string itemId)
+    {
+        var puzzle = new AmberShorePuzzle(_world);
+        var feedback = puzzle.PlaceGlass(slot, itemId);
+        HandlePuzzleFeedback(feedback, null);
+        if (feedback == PuzzleFeedback.Solved)
+        {
+            PuzzleProgression.OnAmberShoreSolved(_world);
+            Autosave();
+        }
+    }
+
+    private void RemoveGlassFromAltarSlot(int slot)
+    {
+        var puzzle = new AmberShorePuzzle(_world);
+        if (puzzle.ItemInSlot(slot) is null) return;
+        puzzle.RemoveGlass(slot);
+        _audio.PlaySfx("sfx_interact");
+        ShowToast("You lift the tide-glass free of the altar.");
     }
 
     private void HandlePuzzleFeedback(PuzzleFeedback feedback, string? hintDiscoveryId)
@@ -498,13 +542,13 @@ public sealed class RegionScene : IScene
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         var viewport = _manager.Game.GraphicsDevice.Viewport;
-        var ground = TextureFactory.FromHex(_region.GroundColorHex);
 
         spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix(), samplerState: SamplerState.PointClamp);
         DrawTiles(spriteBatch);
+        DrawAmbientDetails(spriteBatch);
         DrawInteractables(spriteBatch);
         DrawNpcs(spriteBatch);
-        spriteBatch.Draw(_playerTexture, new Vector2(_player.Bounds.X, _player.Bounds.Y), Color.White);
+        DrawPlayer(spriteBatch);
         spriteBatch.End();
 
         spriteBatch.Begin();
@@ -529,27 +573,102 @@ public sealed class RegionScene : IScene
 
     private void DrawInteractables(SpriteBatch spriteBatch)
     {
+        var bob = _settings.ReducedMotion ? 0f : MathF.Sin(_visualTime * 2.8f) * 1.5f;
+        var pulse = _settings.ReducedFlash ? 0.88f : 0.82f + (MathF.Sin(_visualTime * 3.2f) + 1f) * 0.09f;
         foreach (var i in _region.Interactables)
         {
             if (!IsVisible(i)) continue;
             var icon = i.GrantsItemId is not null
                 ? _itemIconsByItemId.GetValueOrDefault(i.GrantsItemId, _itemIcon)
                 : _landmarkIcon;
-            var center = new Vector2(i.X + i.Width / 2f - icon.Width / 2f, i.Y + i.Height / 2f - icon.Height / 2f);
-            spriteBatch.Draw(icon, center, Color.White);
+            var center = new Vector2(i.X + i.Width / 2f - icon.Width / 2f, i.Y + i.Height / 2f - icon.Height / 2f + bob);
+            spriteBatch.Draw(_pixel, new Rectangle((int)center.X + 2, (int)center.Y + icon.Height - 1, icon.Width - 4, 2), Color.Black * 0.28f);
+            spriteBatch.Draw(icon, center, Color.White * pulse);
         }
     }
 
     private void DrawNpcs(SpriteBatch spriteBatch)
     {
+        var index = 0;
         foreach (var npc in _region.Npcs)
         {
             if (_npcTextures.TryGetValue(npc.Id, out var tex))
             {
-                spriteBatch.Draw(tex, new Vector2(npc.X, npc.Y), Color.White);
+                var bob = _settings.ReducedMotion ? 0f : MathF.Sin(_visualTime * 1.7f + index * 1.9f) * 0.75f;
+                spriteBatch.Draw(_pixel, new Rectangle((int)npc.X + 2, (int)npc.Y + 19, 12, 4), Color.Black * 0.32f);
+                spriteBatch.Draw(tex, new Vector2(npc.X, npc.Y + bob), Color.White);
+            }
+            index++;
+        }
+    }
+
+    private void DrawPlayer(SpriteBatch spriteBatch)
+    {
+        var moving = _player.Velocity.LengthSquared() >= FootstepMinSpeedSquared;
+        var bob = !_settings.ReducedMotion && moving ? MathF.Abs(MathF.Sin(_visualTime * 10f)) * -1.5f : 0f;
+        var bounds = _player.Bounds;
+        spriteBatch.Draw(_pixel, new Rectangle(bounds.X + 2, bounds.Bottom - 2, bounds.Width - 4, 4), Color.Black * 0.38f);
+        spriteBatch.Draw(_playerTexture, new Vector2(bounds.X, bounds.Y + bob), Color.White);
+    }
+
+    /// <summary>
+    /// Gives every region its own visual weather without external assets. Motion is
+    /// deterministic and freezes when Reduced Motion is enabled, so the setting now
+    /// controls a real effect rather than merely being persisted.
+    /// </summary>
+    private void DrawAmbientDetails(SpriteBatch spriteBatch)
+    {
+        var worldWidth = _region.WidthTiles * _region.TileSize;
+        var worldHeight = _region.HeightTiles * _region.TileSize;
+        var time = _settings.ReducedMotion ? 0f : _visualTime;
+
+        for (var i = 0; i < 34; i++)
+        {
+            var seedX = PositiveModulo(i * 97 + RegionId.Length * 41, Math.Max(1, worldWidth));
+            var seedY = PositiveModulo(i * 53 + RegionId.Length * 67, Math.Max(1, worldHeight));
+
+            switch (RegionId)
+            {
+                case "rain_garden":
+                {
+                    var y = PositiveModulo((int)(seedY + time * (34f + i % 5 * 5f)), worldHeight);
+                    var x = PositiveModulo((int)(seedX - time * 12f), worldWidth);
+                    spriteBatch.Draw(_pixel, new Rectangle(x, y, 1, 6), new Color(0x8f, 0xc9, 0xd8) * 0.36f);
+                    break;
+                }
+                case "wind_cliffs":
+                {
+                    var x = PositiveModulo((int)(seedX + time * (18f + i % 4 * 3f)), worldWidth);
+                    var y = seedY + (int)(MathF.Sin(time * 1.3f + i) * 5f);
+                    spriteBatch.Draw(_pixel, new Rectangle(x, y, 5 + i % 6, 1), new Color(0xe4, 0xdd, 0xba) * 0.24f);
+                    break;
+                }
+                case "amber_shore":
+                {
+                    var shimmer = _settings.ReducedFlash ? 0.22f : 0.18f + (MathF.Sin(time * 2.4f + i) + 1f) * 0.10f;
+                    spriteBatch.Draw(_pixel, new Rectangle(seedX, seedY, 2 + i % 4, 1), new Color(0xff, 0xd1, 0x72) * shimmer);
+                    break;
+                }
+                case "archive":
+                {
+                    var y = PositiveModulo((int)(seedY - time * (3f + i % 3)), worldHeight);
+                    var x = seedX + (int)(MathF.Sin(time * 0.7f + i) * 3f);
+                    spriteBatch.Draw(_pixel, new Rectangle(x, y, 1, 1), new Color(0xc9, 0xb3, 0x8d) * 0.33f);
+                    break;
+                }
+                default:
+                {
+                    var x = seedX + (int)(MathF.Sin(time * 0.9f + i) * 5f);
+                    var y = seedY + (int)(MathF.Cos(time * 0.7f + i * 0.5f) * 4f);
+                    var glow = _settings.ReducedFlash ? 0.34f : 0.26f + (MathF.Sin(time * 2f + i) + 1f) * 0.12f;
+                    spriteBatch.Draw(_pixel, new Rectangle(x, y, 2, 2), new Color(0xff, 0xd4, 0x66) * glow);
+                    break;
+                }
             }
         }
     }
+
+    private static int PositiveModulo(int value, int modulus) => (value % modulus + modulus) % modulus;
 
     private void DrawPromptAndToast(SpriteBatch spriteBatch, Viewport viewport)
     {

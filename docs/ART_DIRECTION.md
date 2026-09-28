@@ -13,7 +13,7 @@ Per the brief: "Define base resolution, tile size, palette limits, sprite scale,
 
 ## What's NOT implemented (real gaps, not just unstated)
 
-- **No animation at all.** No idle/walk cycles, no water/foliage motion, no interaction-highlight animation, no region-transition effects, no finale visual effects. Every sprite is a single static generated texture. This is the single biggest visual gap versus the brief's "Required animation" list.
+- **Procedural motion only.** The game now has player movement bob, NPC idle motion, animated interaction highlights, and distinct region weather (rain, wind, shore shimmer, archive dust, village fireflies). It still has no authored idle/walk sprite frames, foliage sheets, region-transition animation, lantern state sheet, or finale sequence. That authored animation pass remains the largest visual gap versus the brief.
 - **No export naming convention**, since nothing is exported from an external tool — textures are generated directly as in-memory `Texture2D`s, never written to disk as intermediate art files.
 - **No hand-authored palette limits** (e.g. "16 colors per region") — procedural generation computes shades algorithmically rather than picking from a constrained swatch, so it can't accidentally violate a limit, but it also isn't demonstrating the discipline a limited palette is meant to enforce.
 

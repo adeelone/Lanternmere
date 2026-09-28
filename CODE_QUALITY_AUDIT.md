@@ -1,5 +1,13 @@
 # Lanternmere — Code Quality & Maintainability Audit
 
+## 2026-09-27 follow-up
+
+- Fixed `scripts/clean-build.ps1` so failed `dotnet` commands terminate the pipeline immediately and report the exact failing command and exit code.
+- Fixed a repeated-region-transition GPU resource leak by disposing every procedural texture owned by `RegionScene` on exit.
+- Replaced the amber-shore altar's implicit first-item selection with a deterministic, cancellable shard picker and explicit removal action.
+- Added region-specific ambient rendering and lightweight entity motion with both `ReducedMotion` and `ReducedFlash` respected.
+- Upgraded the isolated test toolchain after `dotnet list package --vulnerable --include-transitive` identified two high-severity transitive advisories. Game/runtime dependencies were clean.
+
 Scope note: this is a C#/MonoGame desktop game, not a web app — there are no routes, REST APIs, or a database. The equivalent surfaces audited here are: **scenes** (in place of routes/UI components), **JSON content loaders** (in place of API/DB calls), and the **`Lanternmere.Core` logic layer** (in place of backend services). Every finding below was verified by grepping definition sites against call sites across the whole repo, not inferred from naming alone.
 
 Dated 2026-08-25. This is a maintainability pass over a codebase that is functionally complete per `AUDIT.md` — nothing here changes game behavior except where explicitly noted as a bug fix.

@@ -2,6 +2,16 @@
 
 Tracks what's built vs. what `BRIEF.md` requires. Keep this honest — it's the input to `AUDIT.md`.
 
+## Visual-polish / resilience pass (2026-09-27)
+
+- Added distinct animated environmental layers to all five regions: rain in the garden, wind trails on the cliffs, tide-glass shimmer on the shore, archive dust, and village fireflies.
+- Added character shadows, a movement bob for the player, idle breathing for NPCs, and floating/pulsing interaction markers.
+- Wired `ReducedMotion` to freeze environmental and character motion and `ReducedFlash` to remove pulsing brightness changes.
+- Replaced the amber-shore altar's automatic shard guess with an explicit selection panel and a deliberate remove action, eliminating a loop where the same wrong shard could be retried indefinitely.
+- Disposed region-owned procedural textures on scene exit so repeated travel does not accumulate GPU resources.
+- Made `scripts/clean-build.ps1` fail immediately when restore/build/test/publish returns a nonzero exit code instead of continuing with misleading follow-on failures.
+- Updated the test toolchain after a NuGet advisory scan found two high-severity transitive vulnerabilities in the old packages; the shipped game packages were unaffected.
+
 ## Code-quality / maintainability pass (2026-08-31)
 
 See `CODE_QUALITY_AUDIT.md` for the full findings, impact/risk analysis, and cleanup plan. Summary of what changed:
@@ -34,7 +44,7 @@ Everything from the prior architecture-only pass, plus:
 - Controller-disconnected and missing-content-error screens, both actually wired into `Game1` (not just present as unused classes)
 - A real .NET 8 SDK install + full build/test/publish pipeline verified on Windows in this environment: `dotnet build` (0 warnings/errors across all 4 projects), `dotnet test` (53 passing), a Debug launch (confirmed rendering a real region correctly), and a Release `dotnet publish -r win-x64` launched as a standalone packaged `.exe` outside the dev tree
 - `tools/ContentGen`: a schema-correct content generator + self-validator, replacing hand-typed JSON as the content-authoring path
-- GitHub Actions CI (`.github/workflows/ci.yml`): cross-platform Core+test job (Ubuntu/Windows) plus a Windows job that also builds/tests/publishes the full game — not yet run for real on GitHub's runners, since this repo hasn't been pushed there in this pass
+- GitHub Actions CI (`.github/workflows/ci.yml`): cross-platform Core+test job (Ubuntu/Windows) plus a Windows job that also builds/tests/publishes the full game. This was later verified successfully on GitHub for rewritten commit `1870037` on 2026-09-27.
 - `scripts/clean-build.ps1` / `.sh`, both verified to actually run end-to-end in this environment
 - Fixed a real pre-existing bug: `PauseScene.DrawsOverPreviousScene` was `false`, which (per `SceneManager.Draw`'s actual walk-the-stack logic) meant the frozen gameplay scene was never redrawn beneath the pause overlay, contradicting its own doc comment. Now `true`.
 - Fixed a real pre-existing test-isolation bug: `SaveSystemTests` tried to redirect `GameSettings.GetSaveDirectory()` via the `APPDATA` env var, which `Environment.GetFolderPath(SpecialFolder.ApplicationData)` does not reliably honor on Windows. Replaced with a direct, `[ThreadStatic]` test-only override property.
@@ -46,15 +56,12 @@ Everything from the prior architecture-only pass, plus:
 
 ## Known gaps (ordered roughly by what a next pass should tackle first)
 
-1. **No animation.** Every sprite is a single static procedurally-generated texture — no idle/walk cycles, no water/foliage motion, no lantern lit/dark sprite states, no transition or finale visual effects. This is the largest gap versus the brief's art requirements; see `docs/ART_DIRECTION.md`.
-2. **Amber shore altar interaction is simplified.** Interacting with a slot auto-tries whichever carried shard isn't yet correctly placed, rather than an explicit item-select UI. The puzzle *logic* is fully correct and tested regardless (`AmberShorePuzzleTests`) — this is a physical-interaction polish gap, not a logic gap. See `docs/PUZZLES.md`.
-3. **`ReducedMotion` and `ReducedFlash` settings persist but gate nothing**, because no motion or flash effects exist anywhere yet to disable. `ReducedShake` and `HighContrastInteractionIndicators` *are* wired to real effects.
-4. **No confirmation-dialog component**, only one inline confirm-by-pressing-twice case (Pause's "Quit to Title").
-5. **Real Aseprite/Tiled pipeline not used** — a deliberate substitution, not an oversight.
-6. **macOS packaged build untested** — no macOS machine available in this environment.
-7. **No real gamepad/controller hardware tested.** As of the 2026-08-31 pass, gamepad rebinding is software-complete (shared UI with keyboard rebinding, real settings persistence, unit tested) — the only remaining gap is that no physical controller has ever been plugged in to confirm it end to end.
-8. **CI is written but not yet run for real** — `.github/workflows/ci.yml` exists and mirrors commands verified locally, but this repo hasn't been pushed to GitHub in this pass.
-9. **Two screens share proven rendering patterns but weren't independently screenshotted**: `SaveCorruptedScene` and `ControllerDisconnectedScene`, since triggering them for real needs a genuinely corrupted save file or an actual gamepad disconnect event rather than the region/scene dev-launch mechanism used for everything else.
+1. **Animation remains procedural rather than frame-authored.** The game now has player movement, NPC idle motion, animated interaction cues, and region-specific ambient weather, but it still has no hand-authored walk cycles, foliage sprites, lantern state sheet, or cinematic finale sequence. See `docs/ART_DIRECTION.md`.
+2. **No confirmation-dialog component**, only one inline confirm-by-pressing-twice case (Pause's "Quit to Title").
+3. **Real Aseprite/Tiled pipeline not used** — a deliberate substitution, not an oversight.
+4. **macOS packaged build untested** — no macOS machine available in this environment.
+5. **No real gamepad/controller hardware tested.** Gamepad rebinding is software-complete (shared UI with keyboard rebinding, real settings persistence, unit tested), but no physical controller has been used for an end-to-end hardware check.
+6. **Two screens share proven rendering patterns but weren't independently screenshotted**: `SaveCorruptedScene` and `ControllerDisconnectedScene`, since triggering them for real needs a genuinely corrupted save file or an actual gamepad disconnect event rather than the region/scene dev-launch mechanism used for everything else.
 
 ## Explicitly out of scope (not bugs)
 

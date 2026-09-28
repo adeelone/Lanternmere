@@ -6,7 +6,7 @@ A quiet 2D exploration adventure about restoring the names of forgotten places. 
 
 ## Status
 
-A complete, playable first pass: title through credits, all three required regions plus the village hub plus the optional archive secret, five NPCs with dialogue, all three required puzzles, journal/map/inventory UI, save/load/settings, and both endings — see `AUDIT.md` for the honest, requirement-by-requirement breakdown of what's solid vs. still placeholder. Art and audio are procedurally generated placeholders (see `ASSET_MANIFEST.md`), not final assets.
+A complete, playable first pass: title through credits, all three required regions plus the village hub plus the optional archive secret, five NPCs with dialogue, all three required puzzles, journal/map/inventory UI, save/load/settings, and both endings. Region-specific weather, character movement, interaction pulses, and the tide-glass selection panel add a visual-polish layer while remaining procedurally generated placeholders. See `AUDIT.md` for the honest, requirement-by-requirement breakdown and `ASSET_MANIFEST.md` for asset provenance.
 
 ## Stack
 
